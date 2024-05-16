@@ -14,7 +14,7 @@ let HttpCodeEnum = require("../enum/HttpCodeEnum")
 let socketCodeEnum = require("../enum/SocketCodeEnum")
 const SystemError = require("../Error/SystemError")
 const jwtUtil = require('../util/jwtUtil')
-const redisClient = require('../config/redisConfig')
+const redisClient = require('../config/redis')
 const CustomError = require('../Error/CustomError')
 
 class CRUD{

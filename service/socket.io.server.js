@@ -5,7 +5,7 @@ const SocketResponseResult = require('../models/SocketResponseResult')
 const SocketCodeEnum = require('../enum/SocketCodeEnum')
 const { isFriend } = require('./Friend')
 const { isMember } = require('./Group')
-const redisClient = require('../config/redisConfig')
+const redisClient = require('../config/redis')
 
 module.exports = function (server) {
     const io = new Server(server,{

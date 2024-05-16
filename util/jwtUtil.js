@@ -3,7 +3,7 @@ const CustomError = require('../Error/CustomError')
 const HttpCodeEnum = require('../enum/HttpCodeEnum')
 
 module.exports = class jwtUtil{
-    static secret = 'jormun'
+    static secret = process.env['JWT_SECRET']
     // 签发token
     static async signToken(data, hours){
         let resToken = await jwt.sign({data}, this.secret, {expiresIn: 3600*hours })

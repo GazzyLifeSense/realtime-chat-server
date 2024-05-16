@@ -1,5 +1,5 @@
 const SystemError = require("../Error/SystemError");
-const redisClient = require("../config/redisConfig");
+const redisClient = require("../config/redis");
 const HttpCodeEnum = require("../enum/HttpCodeEnum");
 const ResponseResult = require("../models/ResponseResult");
 const { User } = require("../models/user");

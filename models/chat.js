@@ -1,5 +1,5 @@
 
-let mongoose = require('../config/database')
+let mongoose = require('../config/mongodb')
 const chatSchema = new mongoose.Schema({
     from: {type: mongoose.Types.ObjectId, required: true}, // 发送用户的id
     to: {type: mongoose.Types.ObjectId, required: true}, // 接收用户的id

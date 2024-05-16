@@ -27,7 +27,7 @@ exports.getGroups = (_id, res)=>{
 
 // 获取群组列表
 exports.getRecommandGroups = (res)=>{
-    Group.find({isRecommanded: true}).exec((err, group)=>{
+    Group.find({isRecommended: true}).exec((err, group)=>{
         if(err) throw new SystemError(res, err)
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, group)
     })

@@ -4,7 +4,7 @@ const ResponseResult = require("../models/ResponseResult")
 const { Group } = require("../models/group")
 const { User } = require("../models/user")
 const fs = require('fs')
-const redisClient = require("../config/redisConfig")
+const redisClient = require("../config/redis")
 
 // 上传图片
 exports.uploadImg = (_id, filename, filetype, file, uploadType, res)=>{

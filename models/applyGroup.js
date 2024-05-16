@@ -1,4 +1,4 @@
-let mongoose = require('../config/database')
+let mongoose = require('../config/mongodb')
 const applyGroupSchema = new mongoose.Schema({
     from:  {type:mongoose.Types.ObjectId, require: true},  // 申请人
     to:  {type:mongoose.Types.ObjectId, require: true}, // 群id

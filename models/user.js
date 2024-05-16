@@ -1,4 +1,4 @@
-let mongoose = require('../config/database')
+let mongoose = require('../config/mongodb')
 
 let userSchema = new mongoose.Schema({
     username: {type: String, require: true, unique: true} ,         // 用户名

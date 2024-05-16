@@ -1,4 +1,4 @@
-let mongoose = require('../config/database')
+let mongoose = require('../config/mongodb')
 
 let groupSchema = new mongoose.Schema({
     name: {type: String, require: true},      // 标题
@@ -7,7 +7,7 @@ let groupSchema = new mongoose.Schema({
     members: [mongoose.Types.ObjectId], // 群成员列表
     avatar: {type: String, default:''}, // 头像
     banner: {type: String, default:''}, // 横幅
-    isRecommanded: {type: Boolean, default: false}, // 是否推荐
+    isRecommended: {type: Boolean, default: false}, // 是否推荐
     type: String        // 类型
 })
 let Group = mongoose.model('group', groupSchema)
