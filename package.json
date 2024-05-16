@@ -20,10 +20,14 @@
     "express-validator": "^6.15.0",
     "ipip-ipdb": "^0.6.0",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.9.0",
+    "mongoose": "^8.3.5",
     "nanoid": "^3.0.2",
     "nodemon": "^2.0.20",
     "redis": "^4.6.4",
     "socket.io": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/module-alias": "^2.0.4",
+    "module-alias": "^2.2.3"
   }
 }
