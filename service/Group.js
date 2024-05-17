@@ -99,21 +99,19 @@ exports.transferGroup = (groupId, _id, res, server)=>{
 
 // 加入群组
 exports.addGroup = (from, to, res, server)=>{
-    Group.findOne({_id: to}).exec((err, group)=>{
+    Group.findOne({_id: to}).exec().then((group)=>{
         if(err) throw new SystemError(res, err)
         if(!group) throw new CustomError(res, HttpCodeEnum.GROUP_NOT_EXIST)
         if(group.members.indexOf(from) !== -1) throw new CustomError(res, HttpCodeEnum.OBJECT_ALREADY_IN_GROUP)
         // 添加到成员列表
         group.members.push(from)
         // 保存
-        group.save((err, data)=>{
-            if(err) throw new SystemError(res, err)
+        group.save().then(()=>{
             server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.NEW_GROUP))
             // 群员将收到新成员通知
             server.to('group:' + to, SocketCodeEnum.NEW_MEMBER).emit('new', SocketCodeEnum.NEW_MEMBER)
             // 删除申请记录
-            ApplyGroup.remove({from,to},(err,result)=>{
-                if(err) throw new SystemError(res, err)
+            ApplyGroup.remove({from,to}).then(()=>{
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             })
         })
@@ -123,9 +121,7 @@ exports.addGroup = (from, to, res, server)=>{
 // 退出群聊
 exports.exitGroup = (groupId, userId, res)=>{
     // 查找特定群组
-    Group.findOne({_id:groupId}).exec((err,group)=>{
-        if(err) throw new SystemError(res, err)
-        
+    Group.findOne({_id:groupId}).exec().then((group)=>{
         // 群组不存在
         if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
         
@@ -138,14 +134,12 @@ exports.exitGroup = (groupId, userId, res)=>{
         
         // 如果退出后群组无成员，则解散
         if(group.members.length == 0){
-            group.remove((err, _)=>{
-                if(err) throw new SystemError(res, err)
+            group.remove().then(()=>{
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             })
         // 保存
         }else{
-            group.save((err, _)=>{
-                if(err) throw new SystemError(res, err)
+            group.save().then(()=>{
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             })
         }
@@ -155,17 +149,14 @@ exports.exitGroup = (groupId, userId, res)=>{
 // 解散群聊
 exports.dismissGroup = (groupId, res)=>{
     // 查找并删除指定群组
-    Group.findOneAndRemove({_id:groupId}).exec((err)=>{
-        if(err) throw new SystemError(res, err)
+    Group.findOneAndRemove({_id:groupId}).exec().then(()=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
     })
 }
 
 // 修改群组简介
 exports.updateDescription = async(groupId, description, res)=>{
-    Group.updateOne({_id:groupId},{$set:{description}}).exec(async(err, result)=>{
-        if(err) throw new SystemError(res, err)
-        
+    Group.updateOne({_id:groupId},{$set:{description}}).exec().then(async(result)=>{
         // 未修改
         if(!result || result.modifiedCount == 0){
             return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)

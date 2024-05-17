@@ -10,8 +10,7 @@ const { USER_NOT_EXIST } = require("../enum/HttpCodeEnum");
 
 // 注册
 exports.register = (username, password, nickname, req, res)=>{
-    User.findOne({username}, async(err, user)=>{
-        if(err) throw new SystemError(res, err)
+    User.findOne({username}).then(async(user)=>{
         // 用户名已存在
         if(user) return ResponseResult.errorResult(res, HttpCodeEnum.USERNAME_EXIST)
 
@@ -21,16 +20,13 @@ exports.register = (username, password, nickname, req, res)=>{
                 if(err) reject(err)
                 resolve(hash)
             })
-        }).catch((err)=>{
-            throw new SystemError(res, err)
-        });
+        })
 
         // 归属地
         let location = await getLocation(req)
 
         // 创建新用户
-        User.create({username, password, nickname, location}, (err, _)=>{
-            if(err) throw new SystemError(res, err)
+        User.create({username, password, nickname, location}).then(()=>{
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })
     })
@@ -38,8 +34,7 @@ exports.register = (username, password, nickname, req, res)=>{
 
 // 登录
 exports.login = (username, password, req, res)=>{
-    User.findOne({username}).exec(async (err, user)=>{
-        if(err) throw new SystemError(res, err)
+    User.findOne({ username }).exec().then(async user => {
         // 验证失败
         if(!user) {
             return ResponseResult.errorResult(res, HttpCodeEnum.LOGIN_ERROR)
@@ -114,9 +109,7 @@ exports.verifyAndGetUser = async(res, token)=>{
     let user = await redisClient.get('user:'+userId)
     // 如果redis中不存在该用户信息则存储到redis并返回
     if(!user){
-        User.findOne({_id:userId}).exec(async (err, user)=>{
-            if(err) throw new SystemError(res, err)
-
+        User.findOne({_id:userId}).exec().then(async user => {
             // 是否存在
             if(!user) return ResponseResult.errorResult(res, HttpCodeEnum.USER_NOT_EXIST)
             
@@ -126,8 +119,6 @@ exports.verifyAndGetUser = async(res, token)=>{
             // 存储至redis
             redisClient.set('user:'+userId, JSON.stringify(user)).then(()=>{
                 redisClient.expire('user:'+userId, 3600)
-            }).catch((err)=>{
-                throw new SystemError(res, err)
             })
 
             // 不返回密码
@@ -142,9 +133,7 @@ exports.verifyAndGetUser = async(res, token)=>{
 
 // 修改昵称 
 exports.updateNickname = async(userId, nickname, res)=>{
-    User.updateOne({_id:userId},{$set:{nickname}}).exec(async(err, result)=>{
-        if(err) throw new SystemError(res, err)
-        
+    User.updateOne({_id:userId},{$set:{nickname}}).exec().then(async(result)=>{
         // 未修改
         if(!result || result.modifiedCount == 0){
             return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
@@ -158,9 +147,7 @@ exports.updateNickname = async(userId, nickname, res)=>{
 
 // 修改个人介绍
 exports.updateIntroduction = async(userId, introduction, res)=>{
-    User.updateOne({_id:userId},{$set:{introduction}}).exec(async(err, result)=>{
-        if(err) throw new SystemError(res, err)
-
+    User.updateOne({_id:userId},{$set:{introduction}}).exec().then(async(result)=>{
         // 未修改
         if(!result || result.modifiedCount == 0){
             return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
@@ -174,9 +161,7 @@ exports.updateIntroduction = async(userId, introduction, res)=>{
 
 // 修改密码 
 exports.updatePassword = async(userId, password, newPassword, res)=>{
-    User.findOne({_id:userId}).exec(async(err, user)=>{
-        if(err) throw new SystemError(res, err)
-
+    User.findOne({_id:userId}).exec().then(async(user)=>{
         // 是否存在
         if(!user) return ResponseResult.errorResult(res, USER_NOT_EXIST)
 

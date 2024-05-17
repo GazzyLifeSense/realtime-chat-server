@@ -12,10 +12,8 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 // 查询是否有待处理申请
 exports.hasApplies = (_id, res)=>{
-    ApplyFriend.count({to:_id}).exec((err, count)=>{
-        if(err) throw new SystemError(res, err)
-        ApplyGroup.count({owner:_id}).exec((err, total)=>{
-            if(err) throw new SystemError(res, err)
+    ApplyFriend.count({to:_id}).exec().then((count)=>{
+        ApplyGroup.count({owner:_id}).exec().then((total)=>{
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, total+count)
         })
     })
@@ -24,8 +22,7 @@ exports.hasApplies = (_id, res)=>{
 
 // 发送好友申请请求
 exports.applyFriend = (from, to, res, server)=>{
-    User.findOne({username: to},(err, user)=>{
-        if(err) throw new SystemError(res, err)
+    User.findOne({username: to}).then((user)=>{
         // 被申请人不存在
         if(!user) return ResponseResult.errorResult(res, HttpCodeEnum.USER_NOT_EXIST)
         // 申请人与被申请人相同
@@ -33,12 +30,10 @@ exports.applyFriend = (from, to, res, server)=>{
         // 申请人与被申请人非好友
         if(user.friends.indexOf(from) === -1)
             // 发送申请
-            ApplyFriend.findOne({from, to: user._id},(err,apply)=>{
-                if(err) throw new SystemError(res, err)
+            ApplyFriend.findOne({from, to: user._id}).then((apply)=>{
                 // 已发送过申请
                 if(apply) return ResponseResult.errorResult(res, HttpCodeEnum.DONT_DO_THIS_TWICE)
                 new ApplyFriend({from, to: user._id}).save((err,apply)=>{
-                    if(err) throw new SystemError(res, err)
                     // 提示申请人与被申请人
                     server.emit(user._id, new SocketResponseResult(SocketCodeEnum.NEW_APPLY))
                     return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
@@ -73,23 +68,20 @@ exports.getFriendApplies = (_id, res)=>{
                 friends: 0,
             }
         }
-    ]).exec((err, apply)=>{
-        if(err) throw new SystemError(res, err)
+    ]).exec().then((apply)=>{
+     
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, apply)
     })
 }
 
 // 申请加入群组
 exports.applyGroup = (from, to, res, server)=>{
-    Group.findOne({_id: to},(err, group)=>{
-        if(err) throw new SystemError(res, err)
+    Group.findOne({_id: to}).then((group)=>{
         if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
         if(group.members.indexOf(from) === -1)
-            ApplyGroup.findOne({from, to, owner: group.owner},(err,apply)=>{
-                if(err) throw new SystemError(res, err)
+            ApplyGroup.findOne({from, to, owner: group.owner}).then((apply)=>{
                 if(apply) return ResponseResult.errorResult(res, HttpCodeEnum.DONT_DO_THIS_TWICE)
                 new ApplyGroup({from, to, owner: group.owner}).save((err)=>{
-                    if(err) throw new SystemError(res, err)
                     server.emit(group.owner, new SocketResponseResult(SocketCodeEnum.NEW_APPLY))
                     return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
                 })
@@ -138,8 +130,7 @@ exports.getGroupApplies = (_id, res)=>{
                 'groupDetail.__v': 0
             }
         }
-    ]).exec((err, apply)=>{
-        if(err) throw new SystemError(res, err)
+    ]).exec().then((apply)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, apply)
     })
 }
@@ -147,14 +138,12 @@ exports.getGroupApplies = (_id, res)=>{
 // 移除申请
 exports.removeApply = (from, to, type, res, server)=>{
     if(type === 'friend'){
-        ApplyFriend.remove({from, to}).exec((err)=>{
-            if(err) throw new SystemError(res, err)
+        ApplyFriend.remove({from, to}).exec(()=>{
             server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.FRIEND_APPLY_REJECT))
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })
     }else if(type === 'group'){
-        ApplyGroup.remove({from, to}).exec((err)=>{
-            if(err) throw new SystemError(res, err)
+        ApplyGroup.remove({from, to}).exec(()=>{
             server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.GROUP_APPLY_REJECT))
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })

@@ -33,7 +33,7 @@ process.on('uncaughtException', function(err){
     }else if(err instanceof CustomError){
         ResponseResult.errorResult(err.res, err.httpCodeEnum)
     }
-    console.log(err.message, err.stack)
+    console.log(err.message, err.stack,err)
 })
 
 

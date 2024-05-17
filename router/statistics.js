@@ -15,24 +15,21 @@ app.get('/getOnlineUserCount', async (req, res)=>{
 
 // 获取注册用户数量
 app.get('/getUserCount', async (req, res)=>{
-    User.count().exec(async(err, count)=>{
-        if(err) throw new SystemError(res, err)
+    User.count().exec().then(async(count)=>{
         ResponseResult.okResult(res,HttpCodeEnum.SUCCESS,count.toString())
     })
 })
 
 // 获取群组数量
 app.get('/getGroupCount', async (req, res)=>{
-    Group.count().exec(async(err, count)=>{
-        if(err) throw new SystemError(res, err)
+    Group.count().exec().then(async(count)=>{
         ResponseResult.okResult(res,HttpCodeEnum.SUCCESS,count.toString())
     })
 })
 
 // 获取聊天信息数量
 app.get('/getMessageCount', async (req, res)=>{
-    Chat.count().exec(async(err, count)=>{
-        if(err) throw new SystemError(res, err)
+    Chat.count().exec().then(async(count)=>{
         ResponseResult.okResult(res,HttpCodeEnum.SUCCESS,count.toString())
     })
 })
@@ -73,8 +70,7 @@ app.get('/getTopActiveGroup', async (req, res)=>{
         { $unwind: '$groupDetail'},
         // 排序
         { $sort: {"count":-1} }
-    ]).exec((err, result)=>{
-        if(err) throw new SystemError(res, err)
+    ]).exec().then((result)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, result)
     })
 })
@@ -91,8 +87,7 @@ app.get('/getUserLocationPercent', async (req, res)=>{
         {
             $project: {name: '$_id', value: '$count', _id:0}
         }
-    ]).exec((err, result)=>{
-        if(err) return new SystemError(res, err)
+    ]).exec().then((result)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, result)
     })
 })

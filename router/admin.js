@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs/dist/bcrypt')
 const SocketCodeEnum = require('@/enum/SocketCodeEnum')
 const ResponseResult = require("@/models/ResponseResult")
 const SystemError = require("@/Error/SystemError")
+const User = require('@/models/user')
 
 //#region 管理员
 // 批量创建用户
@@ -15,9 +16,7 @@ app.get('/createTestUsers', async(req,res)=>{
             if(err) reject(err)
             resolve(hash)
         })
-    }).catch((err)=>{
-        throw new SystemError(res, err)
-    });
+    })
     
     let provinces = ["北京", "上海", "天津", "重庆", "河北", "山西", "内蒙古", "辽宁", "吉林", "黑龙江", "江苏",
                     "浙江", "安徽", "福建", "江西", "山东", "河南", "湖北", "湖南", "广东", "广西", "海南", "四川",
@@ -37,23 +36,19 @@ app.get('/createTestUsers', async(req,res)=>{
         })
     }
 
-    User.insertMany(userDocument, (err, result)=>{
-        if(err) throw new SystemError(res, err)
+    User.insertMany(userDocument).then((result)=>{
         if(result?.length == amount){
             ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         }else{
             ResponseResult.errorResult(res, HttpCodeEnum.COMPLETE_PARTIAL)
         }
-            
-        
     })
 })
 
 // 获取用户列表
 app.get('/getUserList', async (req, res)=>{
     // 查找并返回结果
-    User.find().exec(async(err, users)=>{
-        if(err) throw new SystemError(res, err)
+    User.find().exec().then(async( users)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, users)
     });
 })
@@ -64,8 +59,7 @@ app.post('/updateNicknameByAdmin',
     validatorRules.nickname,
     validator,
     async (req, res)=>{
-        User.updateOne({_id:req.body.userId},{$set:{nickname:req.body.nickname}}).exec(async(err, result)=>{
-            if(err) throw new SystemError(res, err)
+        User.updateOne({_id:req.body.userId},{$set:{nickname:req.body.nickname}}).exec().then(async(result)=>{
             if(!result || result.modifiedCount == 0) return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
             
             redisClient.del('user:'+req.body.userId)
@@ -80,8 +74,7 @@ app.post('/banByAdmin',
     validator,
     async (req, res)=>{
         let _id = req.body.userId
-        User.updateOne({_id},{$set:{isBanned:req.body.isBanned}}).exec(async(err, result)=>{
-            if(err || !result) throw new SystemError(res, err)
+        User.updateOne({_id},{$set:{isBanned:req.body.isBanned}}).exec().then(async(result)=>{
             // 修改成功          
             if(result.modifiedCount == 1) {
                 if(req.body.isBanned==true){
@@ -102,9 +95,7 @@ app.post('/banManyByAdmin',
     validator,
     async (req, res)=>{
         let userIds = req.body.userIds
-        User.updateMany({_id:userIds},{$set:{isBanned:req.body.isBanned}}).exec(async(err, result)=>{
-            if(err || !result) throw new SystemError(res, err)
-
+        User.updateMany({_id:userIds},{$set:{isBanned:req.body.isBanned}}).exec().then(async(result)=>{
             // 修改成功          
             if(result.modifiedCount > 0) {
                 if(req.body.isBanned==true)
@@ -128,8 +119,7 @@ app.post('/removeUser',
     validator,
     async (req, res)=>{
         let userId = req.body.userId
-        User.remove({_id: userId}).exec(async(err, result)=>{
-            if(err || !result) throw new SystemError(res, err)
+        User.remove({_id: userId}).exec().then(async(result)=>{
             if(result.deletedCount == 1){
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, result)
             }
@@ -140,8 +130,7 @@ app.post('/removeUser',
 // 批量删除用户
 app.post('/removeManyUser', async (req, res)=>{
     let userIds = req.body.userIds
-    User.remove({_id: userIds}).exec(async(err, result)=>{
-        if(err || !result) throw new SystemError(res, err)
+    User.remove({_id: userIds}).exec().then(async(result)=>{
         if(result.deletedCount == userIds.length){
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, result)
         }
@@ -169,8 +158,7 @@ app.post('/createTestGroups',
             })
         }
 
-        Group.insertMany(groupDocument, (err, result)=>{
-            if(err) throw new SystemError(res, err)
+        Group.insertMany(groupDocument, (result)=>{
             if(result?.length == amount){
                 ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             }else{
@@ -181,8 +169,7 @@ app.post('/createTestGroups',
 
 // 获取群组列表
 app.get('/getGroupList', async (req, res)=>{
-    Group.find().exec(async(err, groups)=>{
-        if(err) throw new SystemError(res, err)
+    Group.find().exec().then(async(groups)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, groups)
     });
 })
@@ -193,8 +180,7 @@ app.post('/recommandByAdmin',
     validatorRules.isRecommended,
     validator,
     async (req, res)=>{
-        Group.updateOne({_id:req.body.groupId},{$set:{isRecommended:req.body.isRecommended}}).exec(async(err, result)=>{
-            if(err) throw new SystemError(res, err)
+        Group.updateOne({_id:req.body.groupId},{$set:{isRecommended:req.body.isRecommended}}).exec().then(async(result)=>{
             if(!result || result.modifiedCount == 0) return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         });
@@ -206,8 +192,7 @@ app.post('/updateGroupnameByAdmin',
     validatorRules.groupName,
     validator,
     async (req, res)=>{
-        Group.updateOne({_id:req.body.groupId},{$set:{name:req.body.groupName}}).exec(async(err, result)=>{
-            if(err) throw new SystemError(res, err)
+        Group.updateOne({_id:req.body.groupId},{$set:{name:req.body.groupName}}).exec().then(async(result)=>{
             if(!result || result.modifiedCount == 0) return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         });
@@ -219,8 +204,7 @@ app.post('/dismissByAdmin',
     validator,
     async (req, res)=>{
         let _id = req.body.groupId
-        Group.remove({_id}).exec(async(err, result)=>{
-            if(err || !result) throw new SystemError(res, err)
+        Group.remove({_id}).exec().then(async(result)=>{
             // 删除成功          
             if(result.deletedCount == 1) {
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
@@ -234,8 +218,7 @@ app.post('/dismissManyByAdmin',
     async (req, res)=>{
         let groupIds = req.body.groupIds
         if(groupIds.length == 0) return ResponseResult.errorResult(res, HttpCodeEnum.CONTENT_NOT_NULL)
-        Group.remove({_id:groupIds}).exec(async(err, result)=>{
-            if(err || !result) throw new SystemError(res, err)
+        Group.remove({_id:groupIds}).exec().then(async(result)=>{
             // 删除成功          
             if(result.deletedCount == groupIds.length) {
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
