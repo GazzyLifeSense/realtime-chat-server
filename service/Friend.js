@@ -70,14 +70,14 @@ exports.deleteFriend = (from, to, res)=>{
      
         if(!todata) return ResponseResult.errorResult(res, HttpCodeEnum.User_NOT_EXIST)
         // 从对方好友列表移除自己
-        todata.friends.remove(ObjectId(from))
+        todata.friends.remove(new ObjectId(from))
         // 保存
         todata.save().then(()=>{
             // 查找自己的用户
             User.findOne({_id:from}, (fromdata)=>{
                 if(!fromdata) return ResponseResult.errorResult(res, HttpCodeEnum.User_NOT_EXIST)
                 // 将对方从自己的好友列表移除
-                fromdata.friends.remove(ObjectId(to))
+                fromdata.friends.remove(new ObjectId(to))
                 // 保存
                 fromdata.save().then(()=>{
                     return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)

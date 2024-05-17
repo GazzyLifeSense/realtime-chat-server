@@ -68,7 +68,7 @@ exports.removeMember = (groupId, _id, res)=>{
     Group.findOne({_id:groupId}).exec().then((group)=>{
         if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
         // 移除特定成员
-        group.members.splice(group.members.indexOf(ObjectId(_id)),1)
+        group.members.splice(group.members.indexOf(new ObjectId(_id)),1)
         // 保存
         group.save().then(()=>{
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
@@ -78,7 +78,7 @@ exports.removeMember = (groupId, _id, res)=>{
 
 // 转让群组
 exports.transferGroup = (groupId, _id, res, server)=>{
-    Group.findOneAndUpdate({_id:groupId}, {$set:{owner:ObjectId(_id)}}).exec().then((result)=>{
+    Group.findOneAndUpdate({_id:groupId}, {$set:{owner:new ObjectId(_id)}}).exec().then((result)=>{
         if(result){
             ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             server.to(_id).emit(_id, new SocketResponseResult(SocketCodeEnum.BE_OWNER, groupId))
@@ -117,11 +117,11 @@ exports.exitGroup = (groupId, userId, res)=>{
         if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
         
         // 如果请求用户为群主，且群组存在其他成员，则必须先转让群组
-        if(group.owner == ObjectId(userId) && group.members.length > 1) 
+        if(group.owner == new ObjectId(userId) && group.members.length > 1) 
             return ResponseResult.errorResult(res, HttpCodeEnum.TRANSFER_GROUP_TO_OTHERS)
         
         // 将特定用户移出群组
-        group.members.splice(group.members.indexOf(ObjectId(userId)),1)
+        group.members.splice(group.members.indexOf(new ObjectId(userId)),1)
         
         // 如果退出后群组无成员，则解散
         if(group.members.length == 0){

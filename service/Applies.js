@@ -58,7 +58,7 @@ exports.getFriendApplies = (_id, res)=>{
             $unwind: '$apply'
         },
         {
-            $match: { 'apply.to': ObjectId(_id) }
+            $match: { 'apply.to': new ObjectId(_id) }
         },
         {
             $project: {
@@ -110,7 +110,7 @@ exports.getGroupApplies = (_id, res)=>{
             }
         },
         {
-            $match: { 'groupDetail.owner': ObjectId(_id)}
+            $match: { 'groupDetail.owner': new ObjectId(_id)}
         },
         {
             $unwind: '$applyFrom'

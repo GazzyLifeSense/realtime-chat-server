@@ -248,7 +248,7 @@ class CRUD{
                 },
             },
             {
-                $match: { 'applyFrom.to': ObjectId(_id) }
+                $match: { 'applyFrom.to': new ObjectId(_id) }
             },
             {
                 $project: {
@@ -281,7 +281,7 @@ class CRUD{
                 }
             },
             {
-                $match: { 'groupDetail.owner': ObjectId(_id)}
+                $match: { 'groupDetail.owner': new ObjectId(_id)}
             },
             {
                 $project: {
@@ -410,7 +410,7 @@ class CRUD{
         Group.findOne({_id:groupId}).exec((err,group)=>{
             if(err) throw new SystemError(res)
             if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
-            group.members.splice(group.members.indexOf(ObjectId(_id)),1)
+            group.members.splice(group.members.indexOf(new ObjectId(_id)),1)
             group.save((err, _)=>{
                 if(err) throw new SystemError(res)
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
@@ -442,7 +442,7 @@ class CRUD{
         Group.findOne({_id:groupId}).exec((err,group)=>{
             if(err) throw new SystemError(res)
             if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
-            group.members.splice(group.members.indexOf(ObjectId(_id)),1)
+            group.members.splice(group.members.indexOf(new ObjectId(_id)),1)
             group.save((err, _)=>{
                 if(err) throw new SystemError(res)
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
