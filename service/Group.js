@@ -19,24 +19,21 @@ exports.createGroup = (groupName, userId, type, res)=>{
 
 // 获取群组列表
 exports.getGroups = (_id, res)=>{
-    Group.find({members: _id }).exec((err, group)=>{
-        if(err) throw new SystemError(res, err)
+    Group.find({members: _id }).exec().then((group)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, group)
     })
 }
 
 // 获取群组列表
 exports.getRecommandGroups = (res)=>{
-    Group.find({isRecommended: true}).exec((err, group)=>{
-        if(err) throw new SystemError(res, err)
+    Group.find({isRecommended: true}).exec().then((group)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, group)
     })
 }
 
 // 根据群组名获取群组列表
 exports.getGroupsByName = (name, res)=>{
-    Group.find({ name: {$regex: new RegExp('.*'+name+'.*', 'i')} }).exec((err, group)=>{
-        if(err) throw new SystemError(res, err)
+    Group.find({ name: {$regex: new RegExp('.*'+name+'.*', 'i')} }).exec().then((group)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, group)
     })
 }
@@ -44,8 +41,8 @@ exports.getGroupsByName = (name, res)=>{
 // 是否成员
 exports.isMember = async(from, to)=>{
     var v = await new Promise((resolve, reject) => {
-        Group.findOne({_id:to}, (err, todata)=>{
-            if(err || !todata) resolve('error')
+        Group.findOne({_id:to}).then((todata)=>{
+            if(!todata) resolve('error')
             
             if(todata.members.indexOf(from) === -1)
                 resolve(false)
@@ -57,11 +54,9 @@ exports.isMember = async(from, to)=>{
 
 // 获取成员列表
 exports.getMembers = (groupId, res)=>{
-    Group.findOne({_id:groupId}).exec((err,group)=>{
-        if(err) throw new SystemError(res, err)
+    Group.findOne({_id:groupId}).exec().then((group)=>{
         if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
-        User.find({_id:group.members}).select(['_id','username','nickname','avatar','introduction','location','regDate']).exec((err, member)=>{
-            if(err) throw new SystemError(res, err)
+        User.find({_id:group.members}).select(['_id','username','nickname','avatar','introduction','location','regDate']).exec().then((member)=>{
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, member)
         })
     })
@@ -70,14 +65,12 @@ exports.getMembers = (groupId, res)=>{
 // 移除成员
 exports.removeMember = (groupId, _id, res)=>{
     // 查找群组
-    Group.findOne({_id:groupId}).exec((err,group)=>{
-        if(err) throw new SystemError(res, err)
+    Group.findOne({_id:groupId}).exec().then((group)=>{
         if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
         // 移除特定成员
         group.members.splice(group.members.indexOf(ObjectId(_id)),1)
         // 保存
-        group.save((err, _)=>{
-            if(err) throw new SystemError(res, err)
+        group.save().then(()=>{
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })
     })
@@ -85,8 +78,7 @@ exports.removeMember = (groupId, _id, res)=>{
 
 // 转让群组
 exports.transferGroup = (groupId, _id, res, server)=>{
-    Group.findOneAndUpdate({_id:groupId}, {$set:{owner:ObjectId(_id)}}).exec((err,result)=>{
-        if(err) throw new SystemError(res, err)
+    Group.findOneAndUpdate({_id:groupId}, {$set:{owner:ObjectId(_id)}}).exec().then((result)=>{
         if(result){
             ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             server.to(_id).emit(_id, new SocketResponseResult(SocketCodeEnum.BE_OWNER, groupId))
@@ -100,7 +92,6 @@ exports.transferGroup = (groupId, _id, res, server)=>{
 // 加入群组
 exports.addGroup = (from, to, res, server)=>{
     Group.findOne({_id: to}).exec().then((group)=>{
-        if(err) throw new SystemError(res, err)
         if(!group) throw new CustomError(res, HttpCodeEnum.GROUP_NOT_EXIST)
         if(group.members.indexOf(from) !== -1) throw new CustomError(res, HttpCodeEnum.OBJECT_ALREADY_IN_GROUP)
         // 添加到成员列表

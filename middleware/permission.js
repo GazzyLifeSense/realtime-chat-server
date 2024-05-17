@@ -1,7 +1,7 @@
 const ResponseResult = require("../models/ResponseResult")
 const SystemError = require("@/Error/SystemError")
 const CustomError = require('@/Error/CustomError')
-
+const redisClient = require('@/config/redis')
 //#region 用户
 // 用户本人验证
 const AuthByUserId = async(req, res, next)=>{

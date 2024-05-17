@@ -4,7 +4,6 @@ var location = new ipdb.City('./ipipfree.ipdb')
 module.exports = async function getLocation(req){
     // 获取IP
     var ip = req.ip || '';
-    // console.log(ip);
     
     // 转为IPV4
     ip = ip.substr(ip.lastIndexOf(':')+1,ip.length);
