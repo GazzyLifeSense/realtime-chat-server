@@ -1,7 +1,5 @@
 "use strict";
 var _a;
-var SystemContants = require("../constant/SystemConstants");
-var HttpCodeEnum = require("../enum/HttpCodeEnum");
 module.exports = (_a = /** @class */ (function () {
         function ResponseResult(httpCodeEnum, data) {
             this.code = httpCodeEnum.code;

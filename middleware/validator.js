@@ -1,5 +1,7 @@
 // 参数校验
-const { body, validationResult, Result } = require('express-validator');
+const { body, validationResult } = require('express-validator')
+const ResponseResult = require("@/models/ResponseResult.js")
+const HttpCodeEnum = require("../enum/HttpCodeEnum")
 // 统一校验规则
 const validatorRules = {
     'username': body('username').isString().isLength({min: 1, max: 15}),
