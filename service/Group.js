@@ -10,11 +10,9 @@ const { User } = require("../models/user")
 const ObjectId = require('mongoose').Types.ObjectId 
 
 // 创建群组
-exports.createGroup = (groupName, userId, type, res)=>{
-    Group.create({name: groupName, owner: userId, members: [userId], type}, (err, data)=>{
-        if(err) throw new SystemError(res, err)
-        return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, data)
-    })
+exports.createGroup = async(groupName, userId, type, res)=>{
+    const newGroup = await Group.create({ name: groupName, owner: userId, members: [userId], type })
+    return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, newGroup)
 }
 
 // 获取群组列表
@@ -55,7 +53,7 @@ exports.isMember = async(from, to)=>{
 // 获取成员列表
 exports.getMembers = (groupId, res)=>{
     Group.findOne({_id:groupId}).exec().then((group)=>{
-        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
+        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
         User.find({_id:group.members}).select(['_id','username','nickname','avatar','introduction','location','regDate']).exec().then((member)=>{
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, member)
         })
@@ -66,7 +64,7 @@ exports.getMembers = (groupId, res)=>{
 exports.removeMember = (groupId, _id, res)=>{
     // 查找群组
     Group.findOne({_id:groupId}).exec().then((group)=>{
-        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
+        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
         // 移除特定成员
         group.members.splice(group.members.indexOf(new ObjectId(_id)),1)
         // 保存
@@ -92,8 +90,8 @@ exports.transferGroup = (groupId, _id, res, server)=>{
 // 加入群组
 exports.addGroup = (from, to, res, server)=>{
     Group.findOne({_id: to}).exec().then((group)=>{
-        if(!group) throw new CustomError(res, HttpCodeEnum.GROUP_NOT_EXIST)
-        if(group.members.indexOf(from) !== -1) throw new CustomError(res, HttpCodeEnum.OBJECT_ALREADY_IN_GROUP)
+        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
+        if(group.members.indexOf(from) !== -1)  return ResponseResult.errorResult(res, HttpCodeEnum.DUPLICATE_OPERATE)
         // 添加到成员列表
         group.members.push(from)
         // 保存
@@ -102,7 +100,7 @@ exports.addGroup = (from, to, res, server)=>{
             // 群员将收到新成员通知
             server.to('group:' + to, SocketCodeEnum.NEW_MEMBER).emit('new', SocketCodeEnum.NEW_MEMBER)
             // 删除申请记录
-            ApplyGroup.remove({from,to}).then(()=>{
+            ApplyGroup.deleteOne({from,to}).then(()=>{
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             })
         })
@@ -114,18 +112,18 @@ exports.exitGroup = (groupId, userId, res)=>{
     // 查找特定群组
     Group.findOne({_id:groupId}).exec().then((group)=>{
         // 群组不存在
-        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
+        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
         
         // 如果请求用户为群主，且群组存在其他成员，则必须先转让群组
         if(group.owner == new ObjectId(userId) && group.members.length > 1) 
-            return ResponseResult.errorResult(res, HttpCodeEnum.TRANSFER_GROUP_TO_OTHERS)
+            return ResponseResult.errorResult(res, HttpCodeEnum.INVALID_OPERATE)
         
         // 将特定用户移出群组
         group.members.splice(group.members.indexOf(new ObjectId(userId)),1)
         
         // 如果退出后群组无成员，则解散
         if(group.members.length == 0){
-            group.remove().then(()=>{
+            group.deleteOne().then(()=>{
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             })
         // 保存

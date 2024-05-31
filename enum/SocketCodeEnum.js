@@ -7,7 +7,7 @@ module.exports = {
     NEW_GROUP: {code:5, msg:"您的群组申请已通过"},
     BEEN_DELETED: {code:6, msg:"对方非您的好友"},
     BEEN_REMOVED: {code:7, msg:"您已被移出群组"},
-    GROUP_NOT_EXIST: {code:8, msg:"群组不存在"},
+    TARGET_NOT_EXIST: {code:8, msg:"群组不存在"},
     NEW_MEMBER: {code: 9, msg: '有新的成员加入群组'},
     FRIEND_APPLY_REJECT: {code: 10, msg: '好友申请被拒绝'},
     GROUP_APPLY_REJECT: {code: 11, msg: '群组申请被拒绝'},

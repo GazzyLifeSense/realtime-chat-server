@@ -36,7 +36,7 @@ exports.addFriend = (from, to, res, server)=>{
     if(from == to) return ResponseResult.errorResult(res, HttpCodeEnum.DONT_ADD_YOURSELF)
     User.findOne({_id:to}).then((todata)=>{
         // 被申请人不存在
-        if(!todata) return ResponseResult.errorResult(res, HttpCodeEnum.User_NOT_EXIST)
+        if(!todata) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
         // 申请人与被申请人非好友
         if(todata.friends.indexOf(from) === -1)
             todata.friends.push(from)
@@ -44,14 +44,14 @@ exports.addFriend = (from, to, res, server)=>{
         todata.save().then(()=>{
             User.findOne({_id:from}).then((fromdata)=>{
                 // 申请人不存在
-                if(!fromdata) return ResponseResult.errorResult(res, HttpCodeEnum.User_NOT_EXIST)
+                if(!fromdata) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
                 // 申请人与被申请人非好友
                 if(fromdata.friends.indexOf(to) === -1)
                     fromdata.friends.push(to)
                 fromdata.save().then(()=>{
                     server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.NEW_FRIEND))
                     // 删除申请记录
-                    ApplyFriend.remove({from,to}).then(()=>{
+                    ApplyFriend.deleteOne({from,to}).then(()=>{
                         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
                     })
                 })
@@ -68,14 +68,14 @@ exports.deleteFriend = (from, to, res)=>{
     // 查找对方的用户
     User.findOne({_id:to}).then((todata)=>{
      
-        if(!todata) return ResponseResult.errorResult(res, HttpCodeEnum.User_NOT_EXIST)
+        if(!todata) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
         // 从对方好友列表移除自己
         todata.friends.remove(new ObjectId(from))
         // 保存
         todata.save().then(()=>{
             // 查找自己的用户
             User.findOne({_id:from}, (fromdata)=>{
-                if(!fromdata) return ResponseResult.errorResult(res, HttpCodeEnum.User_NOT_EXIST)
+                if(!fromdata) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
                 // 将对方从自己的好友列表移除
                 fromdata.friends.remove(new ObjectId(to))
                 // 保存

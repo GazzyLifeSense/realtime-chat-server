@@ -24,7 +24,7 @@ exports.hasApplies = (_id, res)=>{
 exports.applyFriend = (from, to, res, server)=>{
     User.findOne({username: to}).then((user)=>{
         // 被申请人不存在
-        if(!user) return ResponseResult.errorResult(res, HttpCodeEnum.USER_NOT_EXIST)
+        if(!user) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
         // 申请人与被申请人相同
         if(user._id == from) return ResponseResult.errorResult(res, HttpCodeEnum.CANT_DO_THIS_FOR_YOURSELF)
         // 申请人与被申请人非好友
@@ -32,14 +32,14 @@ exports.applyFriend = (from, to, res, server)=>{
             // 发送申请
             ApplyFriend.findOne({from, to: user._id}).then((apply)=>{
                 // 已发送过申请
-                if(apply) return ResponseResult.errorResult(res, HttpCodeEnum.DONT_DO_THIS_TWICE)
-                new ApplyFriend({from, to: user._id}).save((err,apply)=>{
+                if(apply) return ResponseResult.errorResult(res, HttpCodeEnum.DUPLICATE_OPERATE)
+                new ApplyFriend({from, to: user._id}).save().then((apply)=>{
                     // 提示申请人与被申请人
                     server.emit(user._id, new SocketResponseResult(SocketCodeEnum.NEW_APPLY))
                     return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
                 })
             })
-        else return ResponseResult.errorResult(res, HttpCodeEnum.ALREADY_BEEN_Friend)
+        else return ResponseResult.errorResult(res, HttpCodeEnum.DUPLICATE_OPERATE)
     })
 }
 
@@ -77,16 +77,16 @@ exports.getFriendApplies = (_id, res)=>{
 // 申请加入群组
 exports.applyGroup = (from, to, res, server)=>{
     Group.findOne({_id: to}).then((group)=>{
-        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
+        if(!group) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
         if(group.members.indexOf(from) === -1)
             ApplyGroup.findOne({from, to, owner: group.owner}).then((apply)=>{
-                if(apply) return ResponseResult.errorResult(res, HttpCodeEnum.DONT_DO_THIS_TWICE)
-                new ApplyGroup({from, to, owner: group.owner}).save((err)=>{
+                if(apply) return ResponseResult.errorResult(res, HttpCodeEnum.DUPLICATE_OPERATE)
+                new ApplyGroup({from, to, owner: group.owner}).save().then(()=>{
                     server.emit(group.owner, new SocketResponseResult(SocketCodeEnum.NEW_APPLY))
                     return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
                 })
             })
-        else throw new CustomError(res, HttpCodeEnum.ALREADY_BEEN_MEMBER)
+        else throw new CustomError(res, HttpCodeEnum.DUPLICATE_OPERATE)
     })
 }
 
@@ -138,12 +138,12 @@ exports.getGroupApplies = (_id, res)=>{
 // 移除申请
 exports.removeApply = (from, to, type, res, server)=>{
     if(type === 'friend'){
-        ApplyFriend.remove({from, to}).exec(()=>{
+        ApplyFriend.deleteOne({from, to}).then(()=>{
             server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.FRIEND_APPLY_REJECT))
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })
     }else if(type === 'group'){
-        ApplyGroup.remove({from, to}).exec(()=>{
+        ApplyGroup.deleteOne({from, to}).exec(()=>{
             server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.GROUP_APPLY_REJECT))
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })

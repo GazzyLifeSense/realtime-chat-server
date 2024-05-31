@@ -1,4 +1,4 @@
-const { app } = require('@/server')
+const { app, server } = require('@/server')
 // 参数校验中间件
 const { validatorRules, validator } = require('@/middleware/validator')
 // 权限校验中间件

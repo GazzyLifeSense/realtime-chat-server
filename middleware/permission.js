@@ -32,12 +32,12 @@ const CheckMembershipByGroupId = async(req, res, next)=>{
             let match = await new Promise((resolve, reject)=>{
                 Group.findOne({_id:req.body.groupId}).exec((err, group)=>{
                     if(err) reject(HttpCodeEnum.SYSTEM_ERROR)
-                    if(!group) reject(HttpCodeEnum.GROUP_NOT_EXIST)
+                    if(!group) reject(HttpCodeEnum.TARGET_NOT_EXIST)
                     // 用户为群组成员
                     if(group?.members.indexOf(new ObjectId(userId)) != -1){
                         resolve(true)
                     }else{
-                        reject(HttpCodeEnum.NOT_GROUP_MEMBER)
+                        reject(HttpCodeEnum.INVALID_OPERATE)
                     }
                 })
             }).catch((err)=>{

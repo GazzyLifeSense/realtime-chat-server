@@ -8,7 +8,6 @@ const { Group } = require("../models/group")
 const { isFriend } = require("./Friend")
 const { isMember } = require("./Group")
 const fs = require('fs')
-const path = require("path")
 
 // 获取从 fromId 发到 toId 的信息
 exports.getPrivateMsgs = (from, to, size, time, res)=>{
@@ -20,8 +19,7 @@ exports.getPrivateMsgs = (from, to, size, time, res)=>{
     if(time == -1) before = Number.POSITIVE_INFINITY
     else before = time
     // 查找消息记录
-    Chat.find({$or:[{from, to},{from: to, to: from}],'create_time':{$lt:before}}).sort({'create_time':-1}).limit(pageSize).exec((err, msg)=>{
-        if(err) throw new SystemError(res, err)
+    Chat.find({$or:[{from, to},{from: to, to: from}],'create_time':{$lt:before}}).sort({'create_time':-1}).limit(pageSize).exec().then((msg)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, msg.reverse())
     })
     
@@ -44,7 +42,7 @@ exports.getGroupMsgs = (groupId, size, time, res)=>{
 
 // 发送图片
 exports.sendPic = async(from, to, filename, filetype, type, file, hash, res, server)=>{
-    if(!/image/.test(filetype)) return ResponseResult.errorResult(res, HttpCodeEnum.FILETYPE_NOT_ALLOW)
+    if(!/image/.test(filetype)) return ResponseResult.errorResult(res, HttpCodeEnum.FILETYPE_NOT_SUPPORT)
     if(type === 1){
         // 检测是否为好友
         let res = await isFriend(from, to)
@@ -70,8 +68,7 @@ exports.sendPic = async(from, to, filename, filetype, type, file, hash, res, ser
     
     // 文件是否已存在
     let exist = await new Promise((resolve, reject)=>{
-        Chat.findOne({content: picname, isPic: 1}, (err, chat)=>{
-            if(err) resolve('error')
+        Chat.findOne({content: picname, isPic: 1}).then((chat)=>{
             if(chat) resolve(true)
             resolve(false)
         })
@@ -95,8 +92,7 @@ exports.sendPic = async(from, to, filename, filetype, type, file, hash, res, ser
     })
 
     function notice(){
-        new Chat({from, to, type, content:picname, isPic:1, create_time: Date.now()}).save(async(err,chatMsg)=>{
-            if(err) throw new SystemError(res, err)
+        new Chat({from, to, type, content:picname, isPic:1, create_time: Date.now()}).save().then((chatMsg)=>{
             if(chatMsg) {     
                 // 提示发送方和接收方
                 if(type == 1){
@@ -111,12 +107,12 @@ exports.sendPic = async(from, to, filename, filetype, type, file, hash, res, ser
                                 server.to(user.toString()).emit(user.toString(), new SocketResponseResult(SocketCodeEnum.GROUP_MSG, chatMsg))
                             })
                         }else{
-                            server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.GROUP_NOT_EXIST))
+                            server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.TARGET_NOT_EXIST))
                         }
                     })
                 }
             }else{
-                return ResponseResult.errorResult(res, HttpCodeEnum.GROUP_NOT_EXIST)
+                return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
             }       
             
         })

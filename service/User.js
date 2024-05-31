@@ -6,7 +6,7 @@ const { User } = require("../models/user");
 const jwtUtil = require("../util/jwtUtil");
 const bcrypt = require('bcryptjs')
 const getLocation = require('../util/location');
-const { USER_NOT_EXIST } = require("../enum/HttpCodeEnum");
+const { TARGET_NOT_EXIST } = require("../enum/HttpCodeEnum");
 
 // 注册
 exports.register = (username, password, nickname, req, res)=>{
@@ -111,7 +111,7 @@ exports.verifyAndGetUser = async(res, token)=>{
     if(!user){
         User.findOne({_id:userId}).exec().then(async user => {
             // 是否存在
-            if(!user) return ResponseResult.errorResult(res, HttpCodeEnum.USER_NOT_EXIST)
+            if(!user) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
             
             // 是否封禁
             if(user.isBanned) return ResponseResult.errorResult(res, HttpCodeEnum.BAN)
@@ -163,7 +163,7 @@ exports.updateIntroduction = async(userId, introduction, res)=>{
 exports.updatePassword = async(userId, password, newPassword, res)=>{
     User.findOne({_id:userId}).exec().then(async(user)=>{
         // 是否存在
-        if(!user) return ResponseResult.errorResult(res, USER_NOT_EXIST)
+        if(!user) return ResponseResult.errorResult(res, TARGET_NOT_EXIST)
 
         // BCrypt算法匹配
         let match = await bcrypt.compare(password, user.password)
@@ -181,8 +181,7 @@ exports.updatePassword = async(userId, password, newPassword, res)=>{
         });
 
         // 保存到数据库
-        user.save((err)=>{
-            if(err) throw new SystemError(res, err)
+        user.save().then(()=>{
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })
     })

@@ -9,7 +9,7 @@ const redisClient = require("../config/redis")
 // 上传图片
 exports.uploadImg = (_id, filename, filetype, file, uploadType, res)=>{
     // 图片类型检查
-    if(!/image/.test(filetype)) return ResponseResult.errorResult(res, HttpCodeEnum.FILETYPE_NOT_ALLOW)
+    if(!/image/.test(filetype)) return ResponseResult.errorResult(res, HttpCodeEnum.FILETYPE_NOT_SUPPORT)
    
     //上传目录获取
     let uploadDir = {0: process.env['AVATAR_PATH'], 1: process.env['GROUP_AVATAR_PATH'], 2: process.env['GROUP_BANNER_PATH']}

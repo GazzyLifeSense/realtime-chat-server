@@ -60,7 +60,7 @@ module.exports = function (server) {
                 }
             }
             // 存储消息记录
-            new Chat({from, to, content, type, create_time: Date.now()}).save(function(error,chatMsg){
+            new Chat({from, to, content, type, create_time: Date.now()}).save().then((chatMsg)=>{
                 
                 // 提示发送方和接收方
                 if(type === 1){
@@ -75,24 +75,12 @@ module.exports = function (server) {
                                 io.to(user.toString()).emit(user.toString(), new SocketResponseResult(SocketCodeEnum.GROUP_MSG, chatMsg))
                             })
                         }else{
-                            io.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.GROUP_NOT_EXIST))
+                            io.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.TARGET_NOT_EXIST))
                         }
                     })
                 }
             })
         })
-        
-        // socket.on('enterPrivateChat', async({token, toId})=>{
-        //     // 验证是否为好友
-        //     let userId = await redisClient.get('token:' + token)
-        //     if(!userId) return
-        //     let res = await isFriend(userId, toId)
-        //     if(res == 'error'){
-        //         return io.to(userId).emit(userId, new SocketResponseResult(SocketCodeEnum.SYSTEM_ERROR))
-        //     }else if(!res){
-        //         return io.to(userId).emit(userId, new SocketResponseResult(SocketCodeEnum.BEEN_DELETED))
-        //     }
-        // })
 
         // 进入群聊
         socket.on('enterGroupChat', async({token, groupId})=>{

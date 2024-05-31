@@ -4,7 +4,6 @@ const { validatorRules, validator } = require('@/middleware/validator')
 const bcrypt = require('bcryptjs/dist/bcrypt')
 const SocketCodeEnum = require('@/enum/SocketCodeEnum')
 const ResponseResult = require("@/models/ResponseResult")
-const SystemError = require("@/Error/SystemError")
 const User = require('@/models/user')
 
 //#region 管理员
@@ -40,7 +39,7 @@ app.get('/createTestUsers', async(req,res)=>{
         if(result?.length == amount){
             ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         }else{
-            ResponseResult.errorResult(res, HttpCodeEnum.COMPLETE_PARTIAL)
+            ResponseResult.errorResult(res, HttpCodeEnum.FAIL)
         }
     })
 })
@@ -119,7 +118,7 @@ app.post('/removeUser',
     validator,
     async (req, res)=>{
         let userId = req.body.userId
-        User.remove({_id: userId}).exec().then(async(result)=>{
+        User.deleteOne({_id: userId}).exec().then(async(result)=>{
             if(result.deletedCount == 1){
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, result)
             }
@@ -130,11 +129,11 @@ app.post('/removeUser',
 // 批量删除用户
 app.post('/removeManyUser', async (req, res)=>{
     let userIds = req.body.userIds
-    User.remove({_id: userIds}).exec().then(async(result)=>{
+    User.deleteOne({_id: userIds}).exec().then(async(result)=>{
         if(result.deletedCount == userIds.length){
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, result)
         }
-        return ResponseResult.errorResult(res, HttpCodeEnum.COMPLETE_PARTIAL)
+        return ResponseResult.errorResult(res, HttpCodeEnum.FAIL)
     });
 })
 
@@ -162,7 +161,7 @@ app.post('/createTestGroups',
             if(result?.length == amount){
                 ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
             }else{
-                ResponseResult.errorResult(res, HttpCodeEnum.COMPLETE_PARTIAL)
+                ResponseResult.errorResult(res, HttpCodeEnum.FAIL)
             }
         })
     })
@@ -204,7 +203,7 @@ app.post('/dismissByAdmin',
     validator,
     async (req, res)=>{
         let _id = req.body.groupId
-        Group.remove({_id}).exec().then(async(result)=>{
+        Group.deleteOne({_id}).exec().then(async(result)=>{
             // 删除成功          
             if(result.deletedCount == 1) {
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
@@ -217,8 +216,8 @@ app.post('/dismissByAdmin',
 app.post('/dismissManyByAdmin', 
     async (req, res)=>{
         let groupIds = req.body.groupIds
-        if(groupIds.length == 0) return ResponseResult.errorResult(res, HttpCodeEnum.CONTENT_NOT_NULL)
-        Group.remove({_id:groupIds}).exec().then(async(result)=>{
+        if(groupIds.length == 0) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_CANNOT_EMPTY)
+        Group.deleteOne({_id:groupIds}).exec().then(async(result)=>{
             // 删除成功          
             if(result.deletedCount == groupIds.length) {
                 return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
