@@ -68,8 +68,7 @@ module.exports = function (server) {
                     io.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.PRIVATE_MSG, chatMsg))
                 // 提示群组成员
                 }else if(type === 2){
-                    Group.findOne({_id: to}).exec((err, group)=>{
-                        if(err) return 
+                    Group.findOne({_id: to}).exec().then((group)=>{
                         if(group){
                             group.members.forEach((user)=>{
                                 io.to(user.toString()).emit(user.toString(), new SocketResponseResult(SocketCodeEnum.GROUP_MSG, chatMsg))

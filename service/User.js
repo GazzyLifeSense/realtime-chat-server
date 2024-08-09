@@ -133,7 +133,8 @@ exports.verifyAndGetUser = async(res, token)=>{
 
 // 修改昵称 
 exports.updateNickname = async(userId, nickname, res)=>{
-    User.updateOne({_id:userId},{$set:{nickname}}).exec().then(async(result)=>{
+    User.updateOne({ _id: userId }, { $set: { nickname } }).exec().then(async (result) => {
+        console.log(result, nickname)
         // 未修改
         if(!result || result.modifiedCount == 0){
             return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
@@ -148,13 +149,14 @@ exports.updateNickname = async(userId, nickname, res)=>{
 // 修改个人介绍
 exports.updateIntroduction = async(userId, introduction, res)=>{
     User.updateOne({_id:userId},{$set:{introduction}}).exec().then(async(result)=>{
+        console.log(result, introduction)
         // 未修改
         if(!result || result.modifiedCount == 0){
             return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
         }
 
         // 删除缓存
-        redisClient.del('user:'+userId)
+        await redisClient.del('user:'+userId)
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, introduction)
     })
 }

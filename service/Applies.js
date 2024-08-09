@@ -143,7 +143,7 @@ exports.removeApply = (from, to, type, res, server)=>{
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })
     }else if(type === 'group'){
-        ApplyGroup.deleteOne({from, to}).exec(()=>{
+        ApplyGroup.deleteOne({from, to}).exec().then(()=>{
             server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.GROUP_APPLY_REJECT))
             return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
         })

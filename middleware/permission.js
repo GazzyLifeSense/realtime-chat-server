@@ -30,7 +30,7 @@ const CheckMembershipByGroupId = async(req, res, next)=>{
         let userId = await redisClient.get('token:'+token)
         if(userId){
             let match = await new Promise((resolve, reject)=>{
-                Group.findOne({_id:req.body.groupId}).exec((err, group)=>{
+                Group.findOne({_id:req.body.groupId}).exec().then((group)=>{
                     if(err) reject(HttpCodeEnum.SYSTEM_ERROR)
                     if(!group) reject(HttpCodeEnum.TARGET_NOT_EXIST)
                     // 用户为群组成员
@@ -57,8 +57,8 @@ const CheckOwnershipByGroupId =  async(req, res, next)=>{
         // 获取userId
         let userId = await redisClient.get('token:'+token)
         if(userId){
-            let match = await new Promise((resolve, reject)=>{
-                Group.findOne({_id: new ObjectId(req.body.groupId)}).exec((err, group)=>{
+            let match = await new Promise((resolve, _)=>{
+                Group.findOne({_id: new ObjectId(req.body.groupId)}).exec().then((group)=>{
                     if(err) throw new SystemError(res, err)
                     if(group && userId == group.owner){
                         resolve(true)

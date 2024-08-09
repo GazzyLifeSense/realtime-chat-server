@@ -9,8 +9,8 @@ const redisClient = require("../config/redis")
 // 上传图片
 exports.uploadImg = (_id, filename, filetype, file, uploadType, res)=>{
     // 图片类型检查
-    if(!/image/.test(filetype)) return ResponseResult.errorResult(res, HttpCodeEnum.FILETYPE_NOT_SUPPORT)
-   
+    if (!/image/.test(filetype)) return ResponseResult.errorResult(res, HttpCodeEnum.FILETYPE_NOT_SUPPORT)
+    
     //上传目录获取
     let uploadDir = {0: process.env['AVATAR_PATH'], 1: process.env['GROUP_AVATAR_PATH'], 2: process.env['GROUP_BANNER_PATH']}
     uploadDir = uploadDir[uploadType]
@@ -27,22 +27,31 @@ exports.uploadImg = (_id, filename, filetype, file, uploadType, res)=>{
         if(err) throw new SystemError(res, err)
         // 用户头像上传
         if(uploadType == 0){
-            User.updateOne({_id},{$set:{avatar:filename}}).exec((err, user)=>{
-                if(err) throw new SystemError(res, err)
-                redisClient.del('user:'+_id)
+            User.updateOne({_id},{$set:{avatar:filename}}).exec().then((result)=>{
+                // 未修改
+                if(!result || result.modifiedCount == 0){
+                    return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
+                }
+                redisClient.del('user:' + _id)
                 ResponseResult.okResult(res,HttpCodeEnum.SUCCESS, filename)
             })
         }
         // 群组头像上传
         else if(uploadType == 1){
-            Group.updateOne({_id},{ $set:{avatar:filename}}).exec((err, result)=>{
-                if(err) throw new SystemError(res, err)
+            Group.updateOne({_id},{ $set:{avatar:filename} }).exec().then((result)=>{
+                // 未修改
+                if(!result || result.modifiedCount == 0){
+                    return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
+                }
                 ResponseResult.okResult(res,HttpCodeEnum.SUCCESS, filename)
             })
         // 群组横幅上传
         }else if(uploadType == 2){
-            Group.updateOne({_id},{ $set:{banner:filename}}).exec((err, result)=>{
-                if(err) throw new SystemError(res, err)
+            Group.updateOne({_id},{ $set:{banner:filename} }).exec().then((result)=>{
+                // 未修改
+                if(!result || result.modifiedCount == 0){
+                    return ResponseResult.errorResult(res, HttpCodeEnum.NOT_MODIFIED)
+                }
                 ResponseResult.okResult(res,HttpCodeEnum.SUCCESS, filename)
             })
         }

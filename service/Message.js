@@ -34,8 +34,7 @@ exports.getGroupMsgs = (groupId, size, time, res)=>{
     if(time == -1) before = Number.POSITIVE_INFINITY
     else before = time
 
-    Chat.find({to: groupId, 'create_time':{$lt:before}}).sort({'create_time':-1}).limit(pageSize).exec((err, msg)=>{
-        if(err) throw new SystemError(res, err)
+    Chat.find({to: groupId, 'create_time':{$lt:before}}).sort({'create_time':-1}).limit(pageSize).exec().then((msg)=>{
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, msg.reverse())
     })
 }
@@ -100,8 +99,7 @@ exports.sendPic = async(from, to, filename, filetype, type, file, hash, res, ser
                     server.to(from).emit(from, new SocketResponseResult(SocketCodeEnum.PRIVATE_MSG, chatMsg))
                 // 提示成员
                 }else if(type == 2){
-                    Group.findOne({_id: to}).exec((err, group)=>{
-                        if(err) throw new SystemError(res, err)
+                    Group.findOne({_id: to}).exec().then((group)=>{
                         if(group){
                             group.members.forEach((user)=>{
                                 server.to(user.toString()).emit(user.toString(), new SocketResponseResult(SocketCodeEnum.GROUP_MSG, chatMsg))
@@ -118,4 +116,3 @@ exports.sendPic = async(from, to, filename, filetype, type, file, hash, res, ser
         })
     }
 }
-          
