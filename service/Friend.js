@@ -74,7 +74,7 @@ exports.deleteFriend = (from, to, res)=>{
         // 保存
         todata.save().then(()=>{
             // 查找自己的用户
-            User.findOne({_id:from}, (fromdata)=>{
+            User.findOne({_id:from}).then((fromdata)=>{
                 if(!fromdata) return ResponseResult.errorResult(res, HttpCodeEnum.TARGET_NOT_EXIST)
                 // 将对方从自己的好友列表移除
                 fromdata.friends.remove(new ObjectId(to))

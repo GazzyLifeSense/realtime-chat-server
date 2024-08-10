@@ -12,9 +12,9 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 // 查询是否有待处理申请
 exports.hasApplies = (_id, res)=>{
-    ApplyFriend.countDocuments({to:_id}).exec().then((count)=>{
-        ApplyGroup.countDocuments({owner:_id}).exec().then((total)=>{
-            return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, total+count)
+    ApplyFriend.countDocuments({to:_id}).exec().then((faCount)=>{
+        ApplyGroup.countDocuments({owner:_id}).exec().then((gaCount)=>{
+            return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, faCount+gaCount)
         })
     })
     
