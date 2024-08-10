@@ -174,7 +174,7 @@ app.get('/getGroupList', async (req, res)=>{
 })
 
 // 修改群组推荐状态
-app.post('/recommandByAdmin', 
+app.post('/recommendByAdmin', 
     validatorRules.groupId,
     validatorRules.isRecommended,
     validator,

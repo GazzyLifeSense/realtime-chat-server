@@ -23,8 +23,9 @@ exports.getGroups = (_id, res)=>{
 }
 
 // 获取群组列表
-exports.getRecommandGroups = (res)=>{
-    Group.find({isRecommended: true}).exec().then((group)=>{
+exports.getRecommendGroups = (res)=>{
+    Group.find({ isRecommended: true }).exec().then((group) => {
+        console.log(group)
         return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS, group)
     })
 }

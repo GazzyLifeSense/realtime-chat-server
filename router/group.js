@@ -7,7 +7,7 @@ const PermissionMiddleware = require('@/middleware/permission')
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart({ maxFieldsSize: 5 * 1024 * 1024 });
 // api
-const { createGroup, getGroups, getGroupsByName, getMembers, removeMember, exitGroup, dismissGroup, updateDescription, getRecommandGroups, transferGroup } = require('@/service/Group');
+const { createGroup, getGroups, getGroupsByName, getMembers, removeMember, exitGroup, dismissGroup, updateDescription, getRecommendGroups, transferGroup } = require('@/service/Group');
 const { uploadImg } = require('@/service/Upload');
 //#region 群组
 // 创建群组
@@ -31,9 +31,9 @@ app.post('/getGroups',
     }
 )
 // 获取推荐群组列表
-app.get('/getRecommandGroups', 
+app.get('/getRecommendGroups', 
     (req, res)=>{
-        getRecommandGroups(res)
+        getRecommendGroups(res)
     }
 )
 // 获取成员列表
