@@ -1,0 +1,212 @@
+[{
+  "_id": {
+    "$oid": "6438099f98e78f975aa95332"
+  },
+  "name": "啊?",
+  "description": "",
+  "owner": {
+    "$oid": "6438099598e78f975aa9532a"
+  },
+  "members": [
+    {
+      "$oid": "6438099598e78f975aa9532a"
+    }
+  ],
+  "avatar": "",
+  "banner": "",
+  "type": "study",
+  "__v": 0,
+  "isRecommended": false
+},
+{
+  "_id": {
+    "$oid": "643dd8ba48ac3202c1523ca3"
+  },
+  "name": "666啊",
+  "description": "666",
+  "owner": {
+    "$oid": "6438099598e78f975aa9532a"
+  },
+  "members": [
+    {
+      "$oid": "6438099598e78f975aa9532a"
+    }
+  ],
+  "avatar": "643dd8ba48ac3202c1523ca3.jpg",
+  "banner": "643dd8ba48ac3202c1523ca3.jpg",
+  "type": "study",
+  "__v": 0,
+  "isRecommended": false
+},
+{
+  "_id": {
+    "$oid": "644e5344e3946eab54a54c11"
+  },
+  "name": "Genshin Impact",
+  "description": "欢迎，旅行者！这是一个可以与其他人讨论你喜欢的游戏——原神的地方。",
+  "owner": {
+    "$oid": "644e52600b220560676d486f"
+  },
+  "members": [
+    {
+      "$oid": "644e52600b220560676d486f"
+    },
+    {
+      "$oid": "6438099598e78f975aa9532a"
+    }
+  ],
+  "avatar": "644e5344e3946eab54a54c11.webp",
+  "banner": "644e5344e3946eab54a54c11.jpg",
+  "type": "game",
+  "__v": 1,
+  "isRecommended": true
+},
+{
+  "_id": {
+    "$oid": "644e535be3946eab54a54c22"
+  },
+  "name": "Minecraft",
+  "description": "欢迎，探险家！",
+  "owner": {
+    "$oid": "644e52600b220560676d486f"
+  },
+  "members": [
+    {
+      "$oid": "644e52600b220560676d486f"
+    }
+  ],
+  "avatar": "644e535be3946eab54a54c22.jpg",
+  "banner": "644e535be3946eab54a54c22.jpg",
+  "type": "game",
+  "__v": 0,
+  "isRecommended": true
+},
+{
+  "_id": {
+    "$oid": "644e5364e3946eab54a54c25"
+  },
+  "name": "OpenAI",
+  "description": "为AI开发者和爱好者提供协作和共享创意的空间。",
+  "owner": {
+    "$oid": "644e52600b220560676d486f"
+  },
+  "members": [
+    {
+      "$oid": "644e52600b220560676d486f"
+    }
+  ],
+  "avatar": "644e5364e3946eab54a54c25.webp",
+  "banner": "644e5364e3946eab54a54c25.jpg",
+  "type": "hobby",
+  "__v": 0,
+  "isRecommended": true
+},
+{
+  "_id": {
+    "$oid": "644e536ee3946eab54a54c28"
+  },
+  "name": "美食",
+  "description": "探索世界之美食！",
+  "owner": {
+    "$oid": "644e52600b220560676d486f"
+  },
+  "members": [
+    {
+      "$oid": "644e52600b220560676d486f"
+    }
+  ],
+  "avatar": "644e536ee3946eab54a54c28.jpg",
+  "banner": "644e536ee3946eab54a54c28.jpg",
+  "type": "hobby",
+  "__v": 0,
+  "isRecommended": true
+},
+{
+  "_id": {
+    "$oid": "64528fd553e5968c39ecee4c"
+  },
+  "name": "测试",
+  "description": "",
+  "owner": {
+    "$oid": "644030a1adda427f17b588bf"
+  },
+  "members": [
+    {
+      "$oid": "644030a1adda427f17b588bf"
+    },
+    {
+      "$oid": "644033e09965bff6cc8b2836"
+    }
+  ],
+  "avatar": "",
+  "banner": "",
+  "type": "hobby",
+  "__v": 1,
+  "isRecommended": false
+},
+{
+  "_id": {
+    "$oid": "6456607f253f3be59df091ba"
+  },
+  "name": "这是一个兴趣群",
+  "description": "",
+  "owner": {
+    "$oid": "6438099598e78f975aa9532a"
+  },
+  "members": [
+    {
+      "$oid": "643d7b883d0ac1a59d0a6d89"
+    },
+    {
+      "$oid": "6438099598e78f975aa9532a"
+    }
+  ],
+  "avatar": "",
+  "banner": "",
+  "type": "hobby",
+  "__v": 3,
+  "isRecommended": false
+},
+{
+  "_id": {
+    "$oid": "64574a344bca30dcd9776214"
+  },
+  "name": "学习",
+  "description": "",
+  "owner": {
+    "$oid": "644e52600b220560676d486f"
+  },
+  "members": [
+    {
+      "$oid": "644e52600b220560676d486f"
+    }
+  ],
+  "avatar": "64574a344bca30dcd9776214.jpg",
+  "banner": "",
+  "type": "study",
+  "__v": 0,
+  "isRecommended": false
+},
+{
+  "_id": {
+    "$oid": "66b969a1d5fed7ae077e7983"
+  },
+  "name": "test",
+  "description": "",
+  "owner": {
+    "$oid": "6646b98f44066e39ecd185ee"
+  },
+  "members": [
+    {
+      "$oid": "6646b98f44066e39ecd185ee"
+    },
+    {
+      "$oid": "66593b4a5f5221ea20daec7d"
+    }
+  ],
+  "avatar": "",
+  "banner": "",
+  "isRecommended": false,
+  "type": "study",
+  "__v": 1
+}]
