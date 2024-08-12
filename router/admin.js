@@ -1,10 +1,13 @@
-const { app } = require('@/server')
+const { app, server } = require('@/server')
+const { User } = require('@/models/user')
+const { Group } = require('@/models/group')
 // 参数校验中间件
 const { validatorRules, validator } = require('@/middleware/validator')
 const bcrypt = require('bcryptjs/dist/bcrypt')
+const HttpCodeEnum = require('@/enum/HttpCodeEnum')
 const SocketCodeEnum = require('@/enum/SocketCodeEnum')
 const ResponseResult = require("@/models/ResponseResult")
-const User = require('@/models/user')
+const redisClient = require('../config/redis')
 
 //#region 管理员
 // 批量创建用户

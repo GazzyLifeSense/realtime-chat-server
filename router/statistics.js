@@ -1,6 +1,10 @@
-const { app } = require('@/server')
+const { app, server } = require('@/server')
 const ResponseResult = require("@/models/ResponseResult")
-const SystemError = require("@/Error/SystemError")
+const { User } = require('@/models/user')
+const { Group } = require('@/models/group')
+const { Chat } = require('@/models/chat')
+const HttpCodeEnum = require('@/enum/HttpCodeEnum')
+const redisClient = require('@/config/redis')
 
 //#region 统计
 // 获取在线终端数
@@ -15,21 +19,21 @@ app.get('/getOnlineUserCount', async (req, res)=>{
 
 // 获取注册用户数量
 app.get('/getUserCount', async (req, res)=>{
-    User.count().exec().then(async(count)=>{
+    User.countDocuments().exec().then(async(count)=>{
         ResponseResult.okResult(res,HttpCodeEnum.SUCCESS,count.toString())
     })
 })
 
 // 获取群组数量
 app.get('/getGroupCount', async (req, res)=>{
-    Group.count().exec().then(async(count)=>{
+    Group.countDocuments().exec().then(async(count)=>{
         ResponseResult.okResult(res,HttpCodeEnum.SUCCESS,count.toString())
     })
 })
 
 // 获取聊天信息数量
 app.get('/getMessageCount', async (req, res)=>{
-    Chat.count().exec().then(async(count)=>{
+    Chat.countDocuments().exec().then(async(count)=>{
         ResponseResult.okResult(res,HttpCodeEnum.SUCCESS,count.toString())
     })
 })
