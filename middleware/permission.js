@@ -1,8 +1,9 @@
+const { Group } = require('@/models/group')
 const ResponseResult = require("../models/ResponseResult")
-const SystemError = require("@/Error/SystemError")
-const CustomError = require('@/Error/CustomError')
 const HttpCodeEnum = require('@/enum/HttpCodeEnum')
 const redisClient = require('@/config/redis')
+const ObjectId = require('mongoose').Types.ObjectId 
+
 //#region 用户
 // 用户本人验证
 const AuthByUserId = async(req, res, next)=>{
@@ -31,7 +32,6 @@ const CheckMembershipByGroupId = async(req, res, next)=>{
         if(userId){
             let match = await new Promise((resolve, reject)=>{
                 Group.findOne({_id:req.body.groupId}).exec().then((group)=>{
-                    if(err) reject(HttpCodeEnum.SYSTEM_ERROR)
                     if(!group) reject(HttpCodeEnum.TARGET_NOT_EXIST)
                     // 用户为群组成员
                     if(group?.members.indexOf(new ObjectId(userId)) != -1){
@@ -40,8 +40,6 @@ const CheckMembershipByGroupId = async(req, res, next)=>{
                         reject(HttpCodeEnum.INVALID_OPERATE)
                     }
                 })
-            }).catch((err)=>{
-                throw new CustomError(res, err)
             })
             if(match) return next()
         }
@@ -59,14 +57,11 @@ const CheckOwnershipByGroupId =  async(req, res, next)=>{
         if(userId){
             let match = await new Promise((resolve, _)=>{
                 Group.findOne({_id: new ObjectId(req.body.groupId)}).exec().then((group)=>{
-                    if(err) throw new SystemError(res, err)
                     if(group && userId == group.owner){
                         resolve(true)
                     }
                     resolve(false)
                 })
-            }).catch((err)=>{
-                throw new SystemError(res, err)
             })
             if(match){
                 return next()

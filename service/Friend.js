@@ -1,4 +1,3 @@
-const SystemError = require("../Error/SystemError")
 const HttpCodeEnum = require("../enum/HttpCodeEnum")
 const SocketCodeEnum = require("../enum/SocketCodeEnum")
 const ResponseResult = require("../models/ResponseResult")

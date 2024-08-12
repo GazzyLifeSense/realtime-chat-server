@@ -1,5 +1,4 @@
 const CustomError = require("../Error/CustomError")
-const SystemError = require("../Error/SystemError")
 const HttpCodeEnum = require("../enum/HttpCodeEnum")
 const SocketCodeEnum = require("../enum/SocketCodeEnum")
 const ResponseResult = require("../models/ResponseResult")
@@ -63,8 +62,9 @@ exports.getFriendApplies = (_id, res)=>{
         {
             $project: {
                 password: 0,
+                '__v': 0,
                 'apply._id': 0,
-                'apply._v': 0,
+                'apply.__v': 0,
                 friends: 0,
             }
         }
@@ -121,7 +121,6 @@ exports.getGroupApplies = (_id, res)=>{
         {
             $project: {
                 password: 0,
-                '_id': 0,
                 '__v': 0,
                 'applyFrom.password': 0,
                 'applyFrom.friends': 0,
