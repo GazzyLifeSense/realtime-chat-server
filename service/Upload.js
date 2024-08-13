@@ -23,7 +23,7 @@ exports.uploadImg = (_id, filename, filetype, file, uploadType, res)=>{
     const buffer = Buffer.from(file, 'base64')
     
     // 保存图片
-    fs.writeFile(uploadDir+filename, buffer, (err, data)=>{
+    fs.writeFile(uploadDir+filename, buffer, (err)=>{
         if(err) throw new SystemError(res, err)
         // 用户头像上传
         if(uploadType == 0){

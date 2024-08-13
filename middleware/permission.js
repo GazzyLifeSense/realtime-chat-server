@@ -55,7 +55,7 @@ const CheckOwnershipByGroupId =  async(req, res, next)=>{
         // 获取userId
         let userId = await redisClient.get('token:'+token)
         if(userId){
-            let match = await new Promise((resolve, _)=>{
+            let match = await new Promise((resolve)=>{
                 Group.findOne({_id: new ObjectId(req.body.groupId)}).exec().then((group)=>{
                     if(group && userId == group.owner){
                         resolve(true)

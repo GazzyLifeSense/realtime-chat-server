@@ -37,7 +37,7 @@ exports.getGroupsByName = (name, res)=>{
 
 // 是否成员
 exports.isMember = async(from, to)=>{
-    var v = await new Promise((resolve, reject) => {
+    var v = await new Promise((resolve) => {
         Group.findOne({_id:to}).then((todata)=>{
             if(!todata) resolve('error')
             

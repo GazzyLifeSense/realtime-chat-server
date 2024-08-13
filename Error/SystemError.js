@@ -1,4 +1,3 @@
-const ResponseResult = require('../models/ResponseResult')
 const HttpCodeEnum = require("../enum/HttpCodeEnum")
 module.exports = class SystemException extends Error{
     res

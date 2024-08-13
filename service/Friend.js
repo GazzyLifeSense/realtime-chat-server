@@ -17,7 +17,7 @@ exports.getFriends = (userId, res)=>{
 
 // 是否好友
 exports.isFriend = async(from, to)=>{
-    var v = await new Promise((resolve, reject) => {
+    var v = await new Promise((resolve) => {
         User.findOne({_id:to}).then((todata)=>{
             if(!todata) resolve('error')
 

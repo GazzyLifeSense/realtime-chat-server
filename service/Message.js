@@ -66,7 +66,7 @@ exports.sendPic = async(from, to, filename, filetype, type, file, hash, res, ser
     let picname = hash + filename.slice(filename.lastIndexOf('.')) 
     
     // 文件是否已存在
-    let exist = await new Promise((resolve, reject)=>{
+    let exist = await new Promise((resolve)=>{
         Chat.findOne({content: picname, isPic: 1}).then((chat)=>{
             if(chat) resolve(true)
             resolve(false)

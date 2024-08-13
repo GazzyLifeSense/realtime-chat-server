@@ -32,7 +32,7 @@ exports.applyFriend = (from, to, res, server)=>{
             ApplyFriend.findOne({from, to: user._id}).then((apply)=>{
                 // 已发送过申请
                 if(apply) return ResponseResult.errorResult(res, HttpCodeEnum.DUPLICATE_OPERATE)
-                new ApplyFriend({from, to: user._id}).save().then((apply)=>{
+                new ApplyFriend({from, to: user._id}).save().then(()=>{
                     // 提示申请人与被申请人
                     server.emit(user._id, new SocketResponseResult(SocketCodeEnum.NEW_APPLY))
                     return ResponseResult.okResult(res, HttpCodeEnum.SUCCESS)
